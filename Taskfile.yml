@@ -1,0 +1,22 @@
+version: "3"
+
+vars:
+  UID:
+    sh: id -u
+  GID:
+    sh: id -g
+
+env:
+  UID: "{{.UID}}"
+  GID: "{{.GID}}"
+
+tasks:
+  up:
+    desc: Start the Docker Compose stack
+    cmds:
+      - docker compose up --build
+
+  down:
+    desc: Stop the Docker Compose stack
+    cmds:
+      - docker compose down

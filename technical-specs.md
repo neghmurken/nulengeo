@@ -56,7 +56,7 @@ Server-side session (native Symfony session, cookie-based, file storage backend 
 
 ### Cross-origin requests
 
-`nelmio/cors-bundle`, configured via environment variable for allowed origins. Needed because the Vite dev server and the Symfony API run on different ports/origins in development.
+Not needed for now. The development environment routes both apps under a single host (`nulengeo.localhost`) via Traefik, path-based (see [Development environment](#development-environment)), so the SPA and the API share the same origin and no CORS bundle is required. `nelmio/cors-bundle` gets added if a cross-origin deployment topology (separate API/web domains in production) is decided later.
 
 ### Error format
 
@@ -103,7 +103,9 @@ CSS Modules — scoped plain CSS, no extra build dependency, sufficient for the 
 
 ## Development environment
 
-Docker Compose, using **FrankenPHP** for the PHP side (Symfony's officially recommended modern runtime — single binary built on Caddy, built-in HTTPS, the default in `symfony/docker`). No separate nginx + PHP-FPM pair.
+Docker Compose, using **FrankenPHP** for the PHP side (Symfony's officially recommended modern runtime — single binary built on Caddy). No separate nginx + PHP-FPM pair. `apps/api`'s Dockerfile is a lean, hand-written, dev-only build (`dunglas/frankenphp:1-php8.4` + the extensions Symfony needs) rather than the `dunglas/symfony-docker` community template — that template bundles Mercure/Vulcain/worker-mode support this project doesn't use, so a custom Dockerfile is shorter and has nothing to strip. `apps/web`'s Dockerfile is similarly a single dev-only stage (`node:24-alpine`, Yarn Berry) running the Vite dev server. Neither app publishes a host port directly; both are reachable only through Traefik.
+
+A project-local **Traefik** (v3) reverse proxy fronts both apps over plain HTTP (no TLS — no production target yet) on a single host, `nulengeo.localhost`, path-based: `/` routes to `web`, `/api/*` routes to `api` (Symfony routes keep the `/api` prefix baked in, no prefix-stripping). This keeps the SPA and API same-origin in development, which is why CORS isn't needed (see [Cross-origin requests](#cross-origin-requests)). Traefik's dashboard is exposed on port 8080 for debugging routes (dev only, `--api.insecure=true`).
 
 ### Task automation
 

@@ -14,10 +14,7 @@ Geography quiz game: place French cities on a stripped-down topographic map (no 
 ## Quick start
 
 ```bash
-task up        # start the Docker Compose stack
-task migrate   # create the SQLite schema
-task import    # import the city dataset
-task test      # run both test suites
+task up   # start the Docker Compose stack
 ```
 
-See [technical-specs.md](./technical-specs.md) for details on every command and design decision.
+Then open http://nulengeo.localhost. `task migrate`/`task import`/`task test`/`task lint` land once their underlying tooling (database, test suites, linters) is in place — see [technical-specs.md](./technical-specs.md) for the full command reference and design decisions.
