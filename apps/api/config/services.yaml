@@ -7,6 +7,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.city_import_csv_url: 'https://www.data.gouv.fr/api/1/datasets/r/c63fd0b1-7987-46f6-b779-8b3ed889090c'
+    app.city_import_cache_path: '%kernel.project_dir%/var/import/communes.csv'
 
 services:
     # default configuration for services in *this* file

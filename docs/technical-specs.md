@@ -43,7 +43,9 @@ Columns used:
  - `population` — municipal population
  - `latitude_centre` / `longitude_centre` — commune territory centroid (the "true position" anchor per the functional spec)
 
-A Symfony console command (`app:city:import`) fetches this CSV at build/deploy time (not committed to the repo, so it always reflects the current INSEE-derived release), filters to communes with population > 1,000, computes the population tier (Small/Medium/Large per the functional spec), and populates the SQLite table.
+A Symfony console command (`app:city:import`) fetches this CSV, filters to communes with population > 1,000, computes the population tier (Small/Medium/Large per the functional spec, using a strict-lower/inclusive-upper split at the 20,000/100,000 thresholds), and populates the SQLite table (existing rows are replaced, so re-running the command is idempotent).
+
+The downloaded CSV is cached on disk (not committed to the repo — gitignored under `var/`) so repeated runs don't re-fetch it. `app:city:import --force` bypasses the cache and re-downloads, for picking up a newer INSEE-derived release. The source URL and cache path are Symfony container parameters (`app.city_import_csv_url`, `app.city_import_cache_path` in `services.yaml`), not hardcoded, so either can be overridden without touching the command.
 
  - HTTP fetch: `symfony/http-client`
  - CSV parsing: `league/csv` (column access by header name — safer than index-based `fgetcsv()` against a 62-column source file)

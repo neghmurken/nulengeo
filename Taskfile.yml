@@ -25,3 +25,13 @@ tasks:
     desc: Stop the Docker Compose stack
     cmds:
       - docker compose down
+
+  migrate:
+    desc: Run Doctrine Migrations inside the API container
+    cmds:
+      - docker compose exec api bin/console doctrine:migrations:migrate --no-interaction
+
+  import:
+    desc: Run the city dataset import command inside the API container
+    cmds:
+      - docker compose exec api bin/console app:city:import
