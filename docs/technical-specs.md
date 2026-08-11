@@ -111,6 +111,7 @@ A project-local **Traefik** (v3) reverse proxy fronts both apps over plain HTTP 
 
 A root-level `Taskfile.yml` (`go-task`) provides a single cross-cutting entrypoint over Docker Compose, Composer, and Yarn, so contributors don't need to remember per-tool invocations (e.g. `docker compose exec api bin/console ...` vs `yarn --cwd apps/web ...`). Per-app scripts still live in `composer.json`/`package.json`; the Taskfile wraps them plus Docker orchestration:
 
+ - `task build` — build the Docker Compose stack images
  - `task up` / `task down` — start/stop the Docker Compose stack
  - `task import` — run the city dataset import command inside the API container
  - `task migrate` — run Doctrine Migrations inside the API container

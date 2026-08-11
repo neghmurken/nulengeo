@@ -1,6 +1,6 @@
 ## Specs
- - The **WHY**: @functional-specs-fr.md
- - The **HOW**: @technical-specs.md
+ - The **WHY**: @docs/functional-specs-fr.md
+ - The **HOW**: @docs/technical-specs.md
 
 ## Do
  - Speak in English

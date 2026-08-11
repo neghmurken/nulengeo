@@ -2,8 +2,8 @@
 
 Geography quiz game: place French cities on a stripped-down topographic map (no names, no roads, no labels) as close as possible to their real location.
 
-- Game rules: [functional-specs-fr.md](./functional-specs-fr.md) (French)
-- Architecture & stack: [technical-specs.md](./technical-specs.md)
+- Game rules: [functional-specs-fr.md](./docs/functional-specs-fr.md) (French)
+- Architecture & stack: [technical-specs.md](./docs/technical-specs.md)
 
 ## Stack
 

@@ -11,10 +11,15 @@ env:
   GID: "{{.GID}}"
 
 tasks:
+  build:
+    desc: Build the Docker Compose stack images
+    cmds:
+      - docker compose build
+
   up:
     desc: Start the Docker Compose stack
     cmds:
-      - docker compose up --build
+      - docker compose up
 
   down:
     desc: Stop the Docker Compose stack
