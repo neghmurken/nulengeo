@@ -1,0 +1,26 @@
+{
+  "app": {
+    "loading": "Chargement...",
+    "error": "Erreur : {{title}}"
+  },
+  "menu": {
+    "title": "Nulengeo",
+    "modes": {
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile"
+    }
+  },
+  "round": {
+    "progress": "Manche {{round}} / {{totalRounds}} — score : {{score}}",
+    "cityPopulation": "{{name}} ({{population}} habitants)",
+    "submitStub": "Valider (temp. : 0, 0)",
+    "result": "Distance : {{distanceKm}} km — score : {{score}}",
+    "next": "Suivant"
+  },
+  "results": {
+    "totalScore": "Score total : {{score}}",
+    "result": "{{name}} — {{distanceKm}} km — {{score}} pts",
+    "backToMenu": "Retour au menu"
+  }
+}

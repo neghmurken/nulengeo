@@ -36,10 +36,21 @@ tasks:
     cmds:
       - docker compose exec api bin/console app:city:import
 
-  test:
+  test-api:
     desc: Run the API test suite (PHPUnit)
     cmds:
       - docker compose exec api bin/phpunit
+
+  test-web:
+    desc: Run the web test suite (Vitest)
+    cmds:
+      - docker compose exec web yarn test
+
+  test:
+    desc: Run both test suites
+    cmds:
+      - task: test-api
+      - task: test-web
 
   lint-api:
     desc: Run the API lint/static-analysis chain (PHPStan + PHP-CS-Fixer)

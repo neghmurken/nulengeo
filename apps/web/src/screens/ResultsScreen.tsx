@@ -1,20 +1,26 @@
+import { useTranslation } from 'react-i18next'
 import type { FinishedGame } from '../api/types.ts'
 import { useGame } from '../game/useGame.ts'
 
 export function ResultsScreen({ game }: { game: FinishedGame }) {
+  const { t } = useTranslation()
   const { returnToMenu } = useGame()
 
   return (
     <section>
-      <h1>Total score: {game.totalScore}</h1>
+      <h1>{t('results.totalScore', { score: game.totalScore })}</h1>
       <ul>
         {game.results.map((result) => (
           <li key={result.inseeCode}>
-            {result.name} — {result.distanceKm} km — {result.score} pts
+            {t('results.result', {
+              name: result.name,
+              distanceKm: result.distanceKm,
+              score: result.score,
+            })}
           </li>
         ))}
       </ul>
-      <button onClick={() => returnToMenu()}>Back to menu</button>
+      <button onClick={() => returnToMenu()}>{t('results.backToMenu')}</button>
     </section>
   )
 }
