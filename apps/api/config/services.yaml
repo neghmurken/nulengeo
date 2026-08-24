@@ -9,6 +9,9 @@
 parameters:
     app.city_import_csv_url: 'https://www.data.gouv.fr/api/1/datasets/r/c63fd0b1-7987-46f6-b779-8b3ed889090c'
     app.city_import_cache_path: '%kernel.project_dir%/var/import/communes.csv'
+    app.game_max_score: 1000
+    app.game_calibration_distance_km: 25
+    app.game_round_count: 10
 
 services:
     # default configuration for services in *this* file

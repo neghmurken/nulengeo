@@ -54,7 +54,20 @@ City draw for a game round: `SELECT ... WHERE tier = ? ORDER BY RANDOM() LIMIT 1
 
 ### Session & game state
 
-Server-side session (native Symfony session, cookie-based, file storage backend for this version). The server holds the drawn city list, current round index, and running score; the client only receives a city's true position and distance/score after a guess is submitted for that round. No accounts, no login — sessions are anonymous and ephemeral, consistent with the functional spec's session-only scope for this version.
+Server-side session (native Symfony session, cookie-based, file storage backend for this version). The server holds the drawn city list, current round index, and running score; the client only receives a city's true position and distance/score after a guess is submitted for that round. No accounts, no login — sessions are anonymous and ephemeral, consistent with the functional spec's session-only scope for this version. Starting a new game always overwrites any game already in the session — nothing persists, so there is no in-progress state worth protecting.
+
+Game state (`App\Model\GameState`) is a small immutable domain object, not a passive DTO: it owns the round state machine — `answerRound()` and `advance()` — and throws a domain exception on illegal transitions (guessing twice, advancing before guessing, acting on a finished game). `App\Repository\GameStates` only loads/saves it to/from the session; the absence of a stored game is its own domain exception (`NoActiveGameException`).
+
+Four RPC-style routes, all under `/api/games`:
+
+ - `POST /api/games` — start a game (`{mode: 'easy'|'medium'|'hard'}`, mapped to city tier `large`/`medium`/`small`)
+ - `POST /api/games/guess` — submit a guess for the current round (`{latitude, longitude}`)
+ - `POST /api/games/next` — advance to the next round (finishes the game after the last one)
+ - `GET /api/games/current` — current game state; the frontend's single source of truth for which screen to show (`idle` / `playing` / `finished`)
+
+Every endpoint returns the same envelope shape, keyed by `status`; the three mutating endpoints return the fresh state directly rather than requiring a follow-up `GET /current`. `GET /current` reports `idle` (not an error) when the session holds no game — "no game yet" is a fresh session's default state, not an exceptional one.
+
+Round scoring uses `App\Service\Score\Calculator` (haversine distance + the exponential score formula from the functional spec). `app.game_max_score`, `app.game_calibration_distance_km`, and `app.game_round_count` are Symfony parameters (`services.yaml`) — game-balance numbers, deliberately overridable without a code change. The `ln(2)` decay base stays a literal: it's mathematically derived from the calibration distance, not an independent tunable.
 
 ### Cross-origin requests
 

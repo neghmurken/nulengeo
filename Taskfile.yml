@@ -35,3 +35,8 @@ tasks:
     desc: Run the city dataset import command inside the API container
     cmds:
       - docker compose exec api bin/console app:city:import
+
+  test:
+    desc: Run the API test suite (PHPUnit)
+    cmds:
+      - docker compose exec api bin/phpunit
