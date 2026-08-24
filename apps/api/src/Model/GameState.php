@@ -12,7 +12,7 @@ use LogicException;
 final readonly class GameState
 {
     /**
-     * @param list<City>        $cities
+     * @param list<City> $cities
      * @param list<RoundResult> $results
      */
     private function __construct(

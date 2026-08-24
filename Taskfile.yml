@@ -40,3 +40,21 @@ tasks:
     desc: Run the API test suite (PHPUnit)
     cmds:
       - docker compose exec api bin/phpunit
+
+  lint-api:
+    desc: Run the API lint/static-analysis chain (PHPStan + PHP-CS-Fixer)
+    cmds:
+      - docker compose exec api composer lint
+      - docker compose exec api composer format
+
+  lint-web:
+    desc: Run the web lint/format chain (ESLint + Prettier)
+    cmds:
+      - docker compose exec web yarn lint
+      - docker compose exec web yarn format
+
+  lint:
+    desc: Run both lint/static-analysis chains
+    cmds:
+      - task: lint-api
+      - task: lint-web

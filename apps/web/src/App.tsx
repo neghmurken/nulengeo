@@ -1,30 +1,27 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-
-type HelloResponse = {
-  message: string
-}
+import { useGame } from './game/useGame.ts'
+import { MenuScreen } from './screens/MenuScreen.tsx'
+import { RoundScreen } from './screens/RoundScreen.tsx'
+import { ResultsScreen } from './screens/ResultsScreen.tsx'
 
 function App() {
-  const [state, setState] = useState<
-    { status: 'loading' } | { status: 'error' } | { status: 'ok'; message: string }
-  >({ status: 'loading' })
+  const { state } = useGame()
 
-  useEffect(() => {
-    fetch('/api/hello')
-      .then((response) => response.json() as Promise<HelloResponse>)
-      .then((data) => setState({ status: 'ok', message: data.message }))
-      .catch(() => setState({ status: 'error' }))
-  }, [])
+  if (state.status === 'loading') {
+    return <p>Loading...</p>
+  }
 
-  return (
-    <section id="hello">
-      <h1>Nulengeo</h1>
-      {state.status === 'loading' && <p>Loading...</p>}
-      {state.status === 'error' && <p>Could not reach the api.</p>}
-      {state.status === 'ok' && <p>{state.message}</p>}
-    </section>
-  )
+  if (state.status === 'error') {
+    return <p>Error: {state.error.title}</p>
+  }
+
+  switch (state.game.status) {
+    case 'idle':
+      return <MenuScreen />
+    case 'playing':
+      return <RoundScreen game={state.game} />
+    case 'finished':
+      return <ResultsScreen game={state.game} />
+  }
 }
 
 export default App

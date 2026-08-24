@@ -60,7 +60,10 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "lint": "phpstan analyse",
+        "format": "php-cs-fixer fix --dry-run --diff",
+        "format:fix": "php-cs-fixer fix"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -72,6 +75,9 @@
         }
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "pedrotroller/php-cs-custom-fixer": "^2.35",
+        "phpstan/phpstan": "^2.2",
         "phpunit/phpunit": "^13.3",
         "symfony/browser-kit": "8.1.*",
         "symfony/css-selector": "8.1.*"
