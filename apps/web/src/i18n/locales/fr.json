@@ -12,9 +12,10 @@
     }
   },
   "round": {
+    "giveUp": "Abandonner",
     "progress": "Manche {{round}} / {{totalRounds}} — score : {{score}}",
     "cityPopulation": "{{name}} ({{population}} habitants)",
-    "submitStub": "Valider (temp. : 0, 0)",
+    "confirmGuess": "Valider",
     "result": "Distance : {{distanceKm}} km — score : {{score}}",
     "next": "Suivant"
   },

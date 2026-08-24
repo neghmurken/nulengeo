@@ -10,6 +10,11 @@ export default defineConfig({
       clientPort: 80,
     },
   },
+  optimizeDeps: {
+    // maplibre-gl loads its own worker as a separate chunk; Vite's
+    // pre-bundling breaks that chunk's MIME type in dev, so it's excluded.
+    exclude: ['maplibre-gl'],
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

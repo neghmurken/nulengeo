@@ -20,7 +20,7 @@ function App() {
     case 'idle':
       return <MenuScreen />
     case 'playing':
-      return <RoundScreen game={state.game} />
+      return <RoundScreen key={state.game.round} game={state.game} />
     case 'finished':
       return <ResultsScreen game={state.game} />
   }
