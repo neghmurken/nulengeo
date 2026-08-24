@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class NextRoundTest extends WebTestCase
+final class NextRoundTest extends GameControllerTestCase
 {
     public function testAdvancingAfterAGuessMovesToRoundTwo(): void
     {
@@ -22,7 +20,7 @@ final class NextRoundTest extends WebTestCase
         $client->request('POST', '/api/games/next');
 
         self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('playing', $payload['status']);
         self::assertSame(2, $payload['round']);
@@ -37,7 +35,7 @@ final class NextRoundTest extends WebTestCase
         $client->request('POST', '/api/games/next');
 
         self::assertResponseStatusCodeSame(409);
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('round_not_answered', $payload['type']);
     }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class SubmitGuessTest extends WebTestCase
+final class SubmitGuessTest extends GameControllerTestCase
 {
     public function testGuessingRevealsTheActualPosition(): void
     {
@@ -21,7 +19,7 @@ final class SubmitGuessTest extends WebTestCase
         );
 
         self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('playing', $payload['status']);
         self::assertArrayHasKey('actual', $payload);
@@ -51,7 +49,7 @@ final class SubmitGuessTest extends WebTestCase
         );
 
         self::assertResponseStatusCodeSame(409);
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('round_already_answered', $payload['type']);
     }

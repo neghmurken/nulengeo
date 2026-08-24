@@ -116,8 +116,9 @@ final readonly class GameState
             'runningScore' => $this->getTotalScore(),
         ];
 
-        if ($this->roundAnswered) {
-            $result = $this->results[array_key_last($this->results)];
+        $result = $this->getResultByInseeCode($city->inseeCode);
+
+        if (null !== $result) {
             $payload['guess'] = ['latitude' => $result->guessPosition->latitude, 'longitude' => $result->guessPosition->longitude];
             $payload['actual'] = ['latitude' => $city->latitude, 'longitude' => $city->longitude];
             $payload['distanceKm'] = $result->distanceKm;
@@ -136,5 +137,16 @@ final readonly class GameState
         }
 
         throw new LogicException(sprintf('City "%s" not found among the drawn cities.', $inseeCode));
+    }
+
+    private function getResultByInseeCode(string $inseeCode): ?RoundResult
+    {
+        foreach ($this->results as $result) {
+            if ($result->inseeCode === $inseeCode) {
+                return $result;
+            }
+        }
+
+        return null;
     }
 }

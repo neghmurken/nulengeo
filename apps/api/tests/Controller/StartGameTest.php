@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class StartGameTest extends WebTestCase
+final class StartGameTest extends GameControllerTestCase
 {
     public function testStartingAGameReturnsTheFirstRound(): void
     {
@@ -15,7 +13,7 @@ final class StartGameTest extends WebTestCase
         $client->request('POST', '/api/games', server: ['CONTENT_TYPE' => 'application/json'], content: '{"mode":"easy"}');
 
         self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('playing', $payload['status']);
         self::assertSame('easy', $payload['mode']);
@@ -33,7 +31,7 @@ final class StartGameTest extends WebTestCase
         $client->request('POST', '/api/games', server: ['CONTENT_TYPE' => 'application/json'], content: '{"mode":"impossible"}');
 
         self::assertResponseStatusCodeSame(400);
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('invalid_mode', $payload['type']);
     }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class CurrentGameTest extends WebTestCase
+final class CurrentGameTest extends GameControllerTestCase
 {
     public function testAFreshSessionIsIdle(): void
     {
@@ -15,7 +13,7 @@ final class CurrentGameTest extends WebTestCase
         $client->request('GET', '/api/games/current');
 
         self::assertResponseIsSuccessful();
-        self::assertSame(['status' => 'idle'], json_decode($client->getResponse()->getContent(), true));
+        self::assertSame(['status' => 'idle'], $this->decodeJson($client->getResponse()));
     }
 
     public function testAStartedGameIsReportedAsPlaying(): void
@@ -26,7 +24,7 @@ final class CurrentGameTest extends WebTestCase
         $client->request('GET', '/api/games/current');
 
         self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent(), true);
+        $payload = $this->decodeJson($client->getResponse());
 
         self::assertSame('playing', $payload['status']);
         self::assertSame(1, $payload['round']);
