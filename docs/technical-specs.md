@@ -43,14 +43,14 @@ Columns used:
  - `population` — municipal population
  - `latitude_centre` / `longitude_centre` — commune territory centroid (the "true position" anchor per the functional spec)
 
-A Symfony console command (`app:city:import`) fetches this CSV, filters to communes with population > 1,000, computes the population tier (Small/Medium/Large per the functional spec, using a strict-lower/inclusive-upper split at the 20,000/100,000 thresholds), and populates the SQLite table (existing rows are replaced, so re-running the command is idempotent).
+A Symfony console command (`app:city:import`) fetches this CSV, filters to metropolitan communes (excluding overseas departments/collectivities, whose INSEE codes start with department prefix `97`/`98`) with population > 5,000, ranks them by population to tag the 30 most populous as the fixed-size `huge` tier, then computes the population tier for the rest (Small/Medium/Large per the functional spec, using a strict-lower/inclusive-upper split at the 20,000/80,000 thresholds), and populates the SQLite table (existing rows are replaced, so re-running the command is idempotent).
 
 The downloaded CSV is cached on disk (not committed to the repo — gitignored under `var/`) so repeated runs don't re-fetch it. `app:city:import --force` bypasses the cache and re-downloads, for picking up a newer INSEE-derived release. The source URL and cache path are Symfony container parameters (`app.city_import_csv_url`, `app.city_import_cache_path` in `services.yaml`), not hardcoded, so either can be overridden without touching the command.
 
  - HTTP fetch: `symfony/http-client`
  - CSV parsing: `league/csv` (column access by header name — safer than index-based `fgetcsv()` against a 62-column source file)
 
-City draw for a game round: `SELECT ... WHERE tier = ? ORDER BY RANDOM() LIMIT 10` — SQLite performs the sampling directly rather than loading the full tier pool into PHP memory.
+City draw for a game round: `SELECT ... WHERE tier = ? ORDER BY RANDOM() LIMIT 6` — SQLite performs the sampling directly rather than loading the full tier pool into PHP memory.
 
 ### Session & game state
 
@@ -58,12 +58,13 @@ Server-side session (native Symfony session, cookie-based, file storage backend 
 
 Game state (`App\Model\GameState`) is a small immutable domain object, not a passive DTO: it owns the round state machine — `answerRound()` and `advance()` — and throws a domain exception on illegal transitions (guessing twice, advancing before guessing, acting on a finished game). `App\Repository\GameStates` only loads/saves it to/from the session; the absence of a stored game is its own domain exception (`NoActiveGameException`).
 
-Four RPC-style routes, all under `/api/games`:
+Five RPC-style routes, all under `/api/games`:
 
- - `POST /api/games` — start a game (`{mode: 'easy'|'medium'|'hard'}`, mapped to city tier `large`/`medium`/`small`)
+ - `POST /api/games` — start a game (`{mode: 'easy'|'medium'|'hard'|'expert'}`, mapped to city tier `huge`/`large`/`medium`/`small`)
  - `POST /api/games/guess` — submit a guess for the current round (`{latitude, longitude}`)
  - `POST /api/games/next` — advance to the next round (finishes the game after the last one)
  - `GET /api/games/current` — current game state; the frontend's single source of truth for which screen to show (`idle` / `playing` / `finished`)
+ - `GET /api/games/modes` — list the available modes, sourced from the `Mode` enum; the frontend fetches this rather than hardcoding the mode list, so adding/renaming a mode is a backend-only change
 
 Every endpoint returns the same envelope shape, keyed by `status`; the three mutating endpoints return the fresh state directly rather than requiring a follow-up `GET /current`. `GET /current` reports `idle` (not an error) when the session holds no game — "no game yet" is a fresh session's default state, not an exceptional one.
 

@@ -7,7 +7,7 @@ Nulengeo est un jeu de quiz en géographie. Le but du jeu est de placer géograp
 A partir d'une carte de France interactive (zoomable, déplaçable) dépouillée de toute information (aucun nom de ville, département, lieu, route, rivière, parc, montagne, etc), seule
 la topographie reste (altitude, relief, cours d'eau, biome), le joueur doit y placer des villes en placant un marqueur au plus proche.
 
-Le jeu propose une série de 10 villes, dont le choix est déterminé par le mode de jeu (voir [Modes de jeu](#modes-de-jeu)). Le marqueur peut être repositionné librement avant validation
+Le jeu propose une série de 6 villes, dont le choix est déterminé par le mode de jeu (voir [Modes de jeu](#modes-de-jeu)). Le marqueur peut être repositionné librement avant validation
 explicite du placement (bouton de confirmation) : aucune pénalité pour un clic accidentel.
 
 Pour chaque ville, le joueur voit uniquement son nom et sa population (voir [Sélection des villes](#sélection-des-villes)) — aucune autre indication (région, département) n'est donnée.
@@ -20,26 +20,30 @@ Ce score s'additionne à un total de fin de partie.
 
 ## Modes de jeu
 
-Le jeu propose 3 modes de difficulté, disponibles librement dès le départ (pas de déblocage progressif). Chaque mode détermine exclusivement dans quel palier de population
-(voir [Sélection des villes](#sélection-des-villes)) sont tirées les 10 villes de la partie :
+Le jeu propose 4 modes de difficulté, disponibles librement dès le départ (pas de déblocage progressif). Chaque mode détermine exclusivement dans quel palier de population
+(voir [Sélection des villes](#sélection-des-villes)) sont tirées les 6 villes de la partie :
 
- - **Facile** : villes du palier Grande uniquement (> 100 000 habitants)
- - **Moyen** : villes du palier Moyenne uniquement (20 000 à 100 000 habitants)
- - **Difficile** : villes du palier Petite uniquement (1 000 à 20 000 habitants)
+ - **Facile** : villes du palier Très grande uniquement
+ - **Moyen** : villes du palier Grande uniquement
+ - **Difficile** : villes du palier Moyenne uniquement
+ - **Expert** : villes du palier Petite uniquement
 
 ## Sélection des villes
 
 Les villes sont tirées aléatoirement, sans remise (une même ville ne peut pas apparaître deux fois dans une même partie), parmi les communes de France métropolitaine
-issues du Code Officiel Géographique (COG) de l'INSEE, avec population et coordonnées du centroïde de la commune.
+issues du Code Officiel Géographique (COG) de l'INSEE, avec population et coordonnées du centroïde de la commune. Les communes des départements et collectivités
+d'outre-mer (Guadeloupe, Martinique, Guyane, La Réunion, Mayotte, Saint-Pierre-et-Miquelon, Saint-Martin, Saint-Barthélemy) sont exclues ; la Corse fait partie de la
+France métropolitaine et reste éligible.
 
-Seules les communes de plus de 1 000 habitants sont éligibles, quel que soit le mode, afin d'exclure les hameaux trop peu peuplés pour offrir une signature topographique
-exploitable.
+Seules les communes de plus de 5 000 habitants sont éligibles, quel que soit le mode, afin d'exclure les hameaux et petites communes trop peu peuplées pour offrir
+une signature topographique exploitable.
 
-Les communes éligibles sont réparties selon un unique critère, le niveau de population, en 3 paliers à seuils fixes :
+Les communes éligibles sont réparties selon un unique critère, le niveau de population, en 4 paliers :
 
- - **Petite** : de 1 000 à 20 000 habitants
- - **Moyenne** : de 20 000 à 100 000 habitants
- - **Grande** : plus de 100 000 habitants
+ - **Petite** : de 5 000 à 20 000 habitants
+ - **Moyenne** : de 20 000 à 80 000 habitants
+ - **Grande** : plus de 80 000 habitants, à l'exception des communes du palier Très grande
+ - **Très grande** : les 30 communes les plus peuplées de France métropolitaine (nombre fixe, indépendant de tout seuil de population)
 
 Le critère de niveau de superficie initialement envisagé est abandonné : il n'est pas retenu pour la sélection des villes.
 
@@ -56,7 +60,7 @@ score = 1000 * e^(-ln(2) / 25 * distance_km)
  - la distance de calibration est de 25 km : au-delà de cette erreur, le score obtenu tombe à environ la moitié du score maximum (500 points)
  - aucun score plancher garanti : le score tend vers 0 à mesure que la distance augmente, sans borne minimale
 
-Le score total d'une partie est la somme des scores obtenus sur les 10 villes, soit un maximum de 10 000 points.
+Le score total d'une partie est la somme des scores obtenus sur les 6 villes, soit un maximum de 6 000 points.
 
 ## Fin de partie
 

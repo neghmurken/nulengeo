@@ -1,4 +1,8 @@
-export type Mode = 'easy' | 'medium' | 'hard'
+export type Mode = string
+
+export type ModesResponse = {
+  modes: Mode[]
+}
 
 export type Coordinates = {
   latitude: number

@@ -37,7 +37,9 @@ final readonly class StartGame
         $mode = Mode::tryFrom($body['mode'] ?? '');
 
         if (null === $mode) {
-            return Problem::create('invalid_mode', 400, 'The "mode" field must be one of: easy, medium, hard.');
+            $validModes = implode(', ', array_column(Mode::cases(), 'value'));
+
+            return Problem::create('invalid_mode', 400, sprintf('The "mode" field must be one of: %s.', $validModes));
         }
 
         $cities = $this->cities->draw($mode->toTier(), $this->roundCount);

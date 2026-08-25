@@ -1,6 +1,6 @@
-import type { Game, Mode, ProblemError } from './types.ts'
+import type { Game, Mode, ModesResponse, ProblemError } from './types.ts'
 
-async function request(path: string, init?: RequestInit): Promise<Game> {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
     credentials: 'include',
@@ -13,15 +13,19 @@ async function request(path: string, init?: RequestInit): Promise<Game> {
     throw body as ProblemError
   }
 
-  return body as Game
+  return body as T
 }
 
 export function getCurrentGame(): Promise<Game> {
-  return request('/api/games/current')
+  return request<Game>('/api/games/current')
+}
+
+export function getModes(): Promise<ModesResponse> {
+  return request<ModesResponse>('/api/games/modes')
 }
 
 export function startGame(mode: Mode): Promise<Game> {
-  return request('/api/games', {
+  return request<Game>('/api/games', {
     method: 'POST',
     body: JSON.stringify({ mode }),
   })
@@ -31,12 +35,12 @@ export function submitGuess(
   latitude: number,
   longitude: number,
 ): Promise<Game> {
-  return request('/api/games/guess', {
+  return request<Game>('/api/games/guess', {
     method: 'POST',
     body: JSON.stringify({ latitude, longitude }),
   })
 }
 
 export function nextRound(): Promise<Game> {
-  return request('/api/games/next', { method: 'POST' })
+  return request<Game>('/api/games/next', { method: 'POST' })
 }

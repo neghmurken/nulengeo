@@ -18,7 +18,7 @@ final class StartGameTest extends GameControllerTestCase
         self::assertSame('playing', $payload['status']);
         self::assertSame('easy', $payload['mode']);
         self::assertSame(1, $payload['round']);
-        self::assertSame(10, $payload['totalRounds']);
+        self::assertSame(6, $payload['totalRounds']);
         self::assertSame(0, $payload['runningScore']);
         self::assertArrayHasKey('name', $payload['city']);
         self::assertArrayHasKey('population', $payload['city']);
