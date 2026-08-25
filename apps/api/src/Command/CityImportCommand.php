@@ -21,9 +21,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 )]
 final class CityImportCommand extends Command
 {
-    private const int MIN_POPULATION = 1_000;
+    private const int MIN_POPULATION = 5_000;
     private const int SMALL_MEDIUM_THRESHOLD = 20_000;
-    private const int MEDIUM_LARGE_THRESHOLD = 100_000;
+    private const int MEDIUM_LARGE_THRESHOLD = 80_000;
+    private const int TOP_TIER_SIZE = 30;
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -83,27 +84,50 @@ final class CityImportCommand extends Command
         $reader = Reader::createFromPath($this->cachePath);
         $reader->setHeaderOffset(0);
 
-        $cities = [];
+        $eligible = [];
         foreach ($reader->getRecords() as $record) {
+            $inseeCode = $record['code_insee'];
             $population = (int) $record['population'];
 
-            if ($population <= self::MIN_POPULATION) {
+            if ($population <= self::MIN_POPULATION || !$this->isMetropolitan($inseeCode)) {
                 continue;
             }
 
-            $cities[] = [
-                'insee_code' => $record['code_insee'],
+            $eligible[] = [
+                'insee_code' => $inseeCode,
                 'name' => $record['nom_standard'],
                 'population' => $population,
                 'latitude' => (float) $record['latitude_centre'],
                 'longitude' => (float) $record['longitude_centre'],
-                'tier' => $this->tierFor($population),
             ];
         }
 
-        $io->note(sprintf('%d cities eligible (population > %d).', count($cities), self::MIN_POPULATION));
+        // The top tier is a fixed count of the most populous cities, not a population band,
+        // so ranking must happen before the remaining rows get banded into the other tiers.
+        usort($eligible, static fn (array $a, array $b): int => $b['population'] <=> $a['population']);
+
+        $cities = array_map(
+            fn (array $city, int $rank): array => [
+                ...$city,
+                'tier' => $rank < self::TOP_TIER_SIZE ? 'huge' : $this->tierFor($city['population']),
+            ],
+            $eligible,
+            array_keys($eligible),
+        );
+
+        $io->note(sprintf('%d cities eligible (population > %d, metropolitan France only).', count($cities), self::MIN_POPULATION));
 
         return $cities;
+    }
+
+    private function isMetropolitan(string $inseeCode): bool
+    {
+        // Overseas departments/collectivities (DROM-COM) use a 3-digit department prefix
+        // starting with 97 or 98 (e.g. 97411 for Saint-Denis, La Réunion); metropolitan
+        // departments, including Corsica's 2A/2B, never do.
+        $departmentPrefix = substr($inseeCode, 0, 2);
+
+        return '97' !== $departmentPrefix && '98' !== $departmentPrefix;
     }
 
     private function tierFor(int $population): string

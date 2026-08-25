@@ -11,7 +11,7 @@ parameters:
     app.city_import_cache_path: '%kernel.project_dir%/var/import/communes.csv'
     app.game_max_score: 1000
     app.game_calibration_distance_km: 25
-    app.game_round_count: 10
+    app.game_round_count: 6
 
 services:
     # default configuration for services in *this* file

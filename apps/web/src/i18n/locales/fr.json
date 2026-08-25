@@ -8,7 +8,8 @@
     "modes": {
       "easy": "Facile",
       "medium": "Moyen",
-      "hard": "Difficile"
+      "hard": "Difficile",
+      "expert": "Expert"
     }
   },
   "round": {
