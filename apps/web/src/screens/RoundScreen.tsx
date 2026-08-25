@@ -2,17 +2,17 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { PlayingGame } from '../api/types.ts'
 import { useGame } from '../game/useGame.ts'
-import { MapView, type Guess } from '../map/MapView.tsx'
+import { MapView, type LatLng } from '../map/MapView.tsx'
 import styles from './RoundScreen.module.css'
 
 export function RoundScreen({ game }: { game: PlayingGame }) {
   const { t } = useTranslation()
   const { submitGuess, nextRound, returnToMenu } = useGame()
-  const [guess, setGuess] = useState<Guess | null>(null)
+  const [guess, setGuess] = useState<LatLng | null>(null)
 
   return (
     <section className={styles.container}>
-      <MapView onGuessChange={setGuess} />
+      <MapView onGuessChange={setGuess} actualPosition={game.actual} />
 
       <div className={styles.topLeft}>
         <button onClick={() => returnToMenu()}>{t('round.giveUp')}</button>
@@ -51,7 +51,7 @@ export function RoundScreen({ game }: { game: PlayingGame }) {
           <>
             <p>
               {t('round.result', {
-                distanceKm: game.distanceKm,
+                distanceKm: game.distanceKm.toFixed(2),
                 score: game.score,
               })}
             </p>

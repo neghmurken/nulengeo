@@ -21,7 +21,8 @@
   },
   "results": {
     "totalScore": "Score total : {{score}}",
-    "result": "{{name}} — {{distanceKm}} km — {{score}} pts",
+    "distance": "{{distanceKm}} km",
+    "score": "{{score}} pts",
     "backToMenu": "Retour au menu"
   }
 }

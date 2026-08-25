@@ -1,0 +1,29 @@
+.container {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.results {
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 0;
+  text-align: left;
+}
+
+.result {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--accent);
+}
+
+.name {
+  flex: 1;
+}
+
+.distance,
+.score {
+  white-space: nowrap;
+}
