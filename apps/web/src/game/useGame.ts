@@ -1,6 +1,6 @@
 import { useContext, type Dispatch } from 'react'
 import type { Game, Mode, ProblemError } from '../api/types.ts'
-import { nextRound, startGame, submitGuess } from '../api/client.ts'
+import { abandonGame, nextRound, startGame, submitGuess } from '../api/client.ts'
 import {
   GameDispatchContext,
   GameStateContext,
@@ -31,6 +31,6 @@ export function useGame() {
     submitGuess: (latitude: number, longitude: number) =>
       run(submitGuess(latitude, longitude)),
     nextRound: () => run(nextRound()),
-    returnToMenu: () => dispatch({ type: 'reset_to_menu' }),
+    returnToMenu: () => run(abandonGame()),
   }
 }

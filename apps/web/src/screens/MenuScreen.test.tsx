@@ -25,15 +25,15 @@ describe('MenuScreen', () => {
     render(<MenuScreen />)
 
     expect(
-      await screen.findByRole('button', { name: 'Facile' }),
+      await screen.findByRole('button', { name: /^Facile/ }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Moyen' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Moyen/ })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: 'Difficile' }),
+      screen.getByRole('button', { name: /^Difficile/ }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Expert' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Expert/ })).toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Difficile' }))
+    await userEvent.click(screen.getByRole('button', { name: /^Difficile/ }))
 
     expect(startGame).toHaveBeenCalledWith('hard')
   })

@@ -44,4 +44,15 @@ final class GameStatesTest extends TestCase
 
         self::assertSame($state, $this->gameStates->load());
     }
+
+    public function testClearRemovesTheStoredGame(): void
+    {
+        $this->gameStates->save(GameState::start(Mode::Easy, []));
+
+        $this->gameStates->clear();
+
+        $this->expectException(NoActiveGameException::class);
+
+        $this->gameStates->load();
+    }
 }

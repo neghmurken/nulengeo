@@ -9,6 +9,7 @@ use App\Model\Position;
 use App\Model\RoundResult;
 use App\Repository\GameStates;
 use App\Service\Score\Calculator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,8 @@ final readonly class SubmitGuess
     public function __construct(
         private GameStates $gameStates,
         private Calculator $calculator,
+        #[Autowire('%app.game_max_score%')]
+        private int $maxScorePerRound,
     ) {
     }
 
@@ -58,7 +61,7 @@ final readonly class SubmitGuess
         $state = $state->answerRound($result);
         $this->gameStates->save($state);
 
-        return new JsonResponse($state->toArray());
+        return new JsonResponse($state->toArray($this->maxScorePerRound));
     }
 
     private function isValidCoordinate(mixed $latitude, mixed $longitude): bool

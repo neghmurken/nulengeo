@@ -22,6 +22,8 @@ final readonly class StartGame
         private GameStates $gameStates,
         #[Autowire('%app.game_round_count%')]
         private int $roundCount,
+        #[Autowire('%app.game_max_score%')]
+        private int $maxScorePerRound,
     ) {
     }
 
@@ -46,6 +48,6 @@ final readonly class StartGame
         $state = GameState::start($mode, $cities);
         $this->gameStates->save($state);
 
-        return new JsonResponse($state->toArray());
+        return new JsonResponse($state->toArray($this->maxScorePerRound));
     }
 }

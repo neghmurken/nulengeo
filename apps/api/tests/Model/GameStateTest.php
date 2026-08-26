@@ -116,7 +116,7 @@ final class GameStateTest extends TestCase
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
 
-        $payload = $state->toArray();
+        $payload = $state->toArray(1000);
 
         self::assertSame([
             'status' => 'playing',
@@ -133,7 +133,7 @@ final class GameStateTest extends TestCase
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
         $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900));
 
-        $payload = $state->toArray();
+        $payload = $state->toArray(1000);
 
         self::assertSame([
             'status' => 'playing',
@@ -153,10 +153,11 @@ final class GameStateTest extends TestCase
     {
         $state = $this->finishedGame();
 
-        $payload = $state->toArray();
+        $payload = $state->toArray(1000);
 
         self::assertSame('finished', $payload['status']);
         self::assertSame(1850, $payload['totalScore']);
+        self::assertSame(2000, $payload['maxScore']);
         self::assertSame([
             ['inseeCode' => '49007', 'name' => 'Angers', 'distanceKm' => 3.2, 'score' => 900],
             ['inseeCode' => '69123', 'name' => 'Lyon', 'distanceKm' => 1.1, 'score' => 950],

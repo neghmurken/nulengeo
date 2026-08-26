@@ -29,6 +29,7 @@ export type PlayingGame = {
 export type FinishedGame = {
   status: 'finished'
   totalScore: number
+  maxScore: number
   results: {
     inseeCode: string
     name: string

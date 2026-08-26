@@ -3,6 +3,7 @@
   --accent: #d4781e;
   --text: #b2ab9f;
   --text-h: var(--accent);
+  --muted: color-mix(in srgb, var(--text) 60%, transparent);
   --bg: var(--primary);
   --radius: 0.5rem;
 

@@ -28,10 +28,12 @@ export function MenuScreen() {
   return (
     <section className={styles.container}>
       <h1>{t('menu.title')}</h1>
+      <p className={styles.explanation}>{t('menu.explanation')}</p>
       <div className={styles.modes}>
         {modes.map((mode) => (
           <button key={mode} onClick={() => startGame(mode)}>
             {t(`menu.modes.${mode}`)}
+            <span className={styles.hint}> · {t(`menu.hints.${mode}`)}</span>
           </button>
         ))}
       </div>

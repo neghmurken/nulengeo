@@ -5,11 +5,18 @@
   },
   "menu": {
     "title": "Nulengeo",
+    "explanation": "Placez chaque ville sur la carte de France grâce à son nom et sa population, sans autre indice.",
     "modes": {
       "easy": "Facile",
       "medium": "Moyen",
       "hard": "Difficile",
       "expert": "Expert"
+    },
+    "hints": {
+      "easy": "Villes très peuplées",
+      "medium": "Grandes villes",
+      "hard": "Villes moyennes",
+      "expert": "Petites villes"
     }
   },
   "round": {
@@ -22,8 +29,10 @@
   },
   "results": {
     "totalScore": "Score total : {{score}}",
-    "distance": "{{distanceKm}} km",
-    "score": "{{score}} pts",
+    "maxScore": " / {{maxScore}}",
+    "round": "{{round}}.",
+    "distanceUnit": "km",
+    "scoreUnit": "pts",
     "backToMenu": "Retour au menu"
   }
 }

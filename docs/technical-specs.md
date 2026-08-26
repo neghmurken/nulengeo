@@ -58,15 +58,16 @@ Server-side session (native Symfony session, cookie-based, file storage backend 
 
 Game state (`App\Model\GameState`) is a small immutable domain object, not a passive DTO: it owns the round state machine — `answerRound()` and `advance()` — and throws a domain exception on illegal transitions (guessing twice, advancing before guessing, acting on a finished game). `App\Repository\GameStates` only loads/saves it to/from the session; the absence of a stored game is its own domain exception (`NoActiveGameException`).
 
-Five RPC-style routes, all under `/api/games`:
+Six RPC-style routes, all under `/api/games`:
 
  - `POST /api/games` — start a game (`{mode: 'easy'|'medium'|'hard'|'expert'}`, mapped to city tier `huge`/`large`/`medium`/`small`)
  - `POST /api/games/guess` — submit a guess for the current round (`{latitude, longitude}`)
  - `POST /api/games/next` — advance to the next round (finishes the game after the last one)
  - `GET /api/games/current` — current game state; the frontend's single source of truth for which screen to show (`idle` / `playing` / `finished`)
+ - `DELETE /api/games/current` — abandon the current game, clearing it from the session; used by the "give up" and "back to menu" actions so a page refresh afterwards reports `idle` instead of resurrecting the abandoned game
  - `GET /api/games/modes` — list the available modes, sourced from the `Mode` enum; the frontend fetches this rather than hardcoding the mode list, so adding/renaming a mode is a backend-only change
 
-Every endpoint returns the same envelope shape, keyed by `status`; the three mutating endpoints return the fresh state directly rather than requiring a follow-up `GET /current`. `GET /current` reports `idle` (not an error) when the session holds no game — "no game yet" is a fresh session's default state, not an exceptional one.
+Every endpoint returns the same envelope shape, keyed by `status`; the four mutating endpoints return the fresh state directly rather than requiring a follow-up `GET /current`. `GET /current` reports `idle` (not an error) when the session holds no game — "no game yet" is a fresh session's default state, not an exceptional one.
 
 Round scoring uses `App\Service\Score\Calculator` (haversine distance + the exponential score formula from the functional spec). `app.game_max_score`, `app.game_calibration_distance_km`, and `app.game_round_count` are Symfony parameters (`services.yaml`) — game-balance numbers, deliberately overridable without a code change. The `ln(2)` decay base stays a literal: it's mathematically derived from the calibration distance, not an independent tunable.
 

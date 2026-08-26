@@ -88,12 +88,13 @@ final readonly class GameState
     /**
      * @return array<string, mixed>
      */
-    public function toArray(): array
+    public function toArray(int $maxScorePerRound): array
     {
         if (GameStatus::Finished === $this->status) {
             return [
                 'status' => $this->status->value,
                 'totalScore' => $this->getTotalScore(),
+                'maxScore' => $maxScorePerRound * count($this->cities),
                 'results' => array_map(
                     fn (RoundResult $result): array => [
                         'inseeCode' => $result->inseeCode,

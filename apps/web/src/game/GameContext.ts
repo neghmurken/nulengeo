@@ -9,7 +9,6 @@ export type GameState =
 export type GameAction =
   | { type: 'game_loaded'; game: Game }
   | { type: 'error'; error: ProblemError }
-  | { type: 'reset_to_menu' }
 
 export function reducer(_state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -17,8 +16,6 @@ export function reducer(_state: GameState, action: GameAction): GameState {
       return { status: 'ready', game: action.game }
     case 'error':
       return { status: 'error', error: action.error }
-    case 'reset_to_menu':
-      return { status: 'ready', game: { status: 'idle' } }
   }
 }
 

@@ -31,4 +31,9 @@ final readonly class GameStates
     {
         $this->requestStack->getSession()->set(self::SESSION_KEY, $state);
     }
+
+    public function clear(): void
+    {
+        $this->requestStack->getSession()->remove(self::SESSION_KEY);
+    }
 }

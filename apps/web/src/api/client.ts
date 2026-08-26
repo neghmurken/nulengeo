@@ -44,3 +44,7 @@ export function submitGuess(
 export function nextRound(): Promise<Game> {
   return request<Game>('/api/games/next', { method: 'POST' })
 }
+
+export function abandonGame(): Promise<Game> {
+  return request<Game>('/api/games/current', { method: 'DELETE' })
+}

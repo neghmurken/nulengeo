@@ -67,6 +67,9 @@ Le score total d'une partie est la somme des scores obtenus sur les 6 villes, so
 En fin de partie, un écran de résumé affiche le score total et le détail par ville (distance, score). Pour cette première version, aucune donnée n'est persistée :
 pas de compte joueur, pas de classement, pas de sauvegarde de meilleur score.
 
+Le joueur peut également abandonner une partie en cours à tout moment (bouton « Abandonner »), ou quitter l'écran de résumé (bouton « Retour au menu ») : dans les deux cas,
+la partie est immédiatement effacée et ne peut pas être reprise, y compris après rechargement de la page.
+
 ## Plateforme et langue
 
 Le jeu cible en priorité les navigateurs desktop (interactions souris/clavier) ; le support tactile/mobile est prévu pour une itération ultérieure.

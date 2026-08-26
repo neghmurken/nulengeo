@@ -7,9 +7,24 @@
   gap: 1rem;
 }
 
+.explanation {
+  max-width: 24rem;
+  margin: 0;
+  color: var(--muted);
+}
+
 .modes {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   min-width: 12rem;
+}
+
+.modes button {
+  text-align: left;
+}
+
+.hint {
+  font-size: 0.8em;
+  opacity: 0.65;
 }
