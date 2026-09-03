@@ -55,7 +55,8 @@ final readonly class SubmitGuess
             $city->inseeCode,
             $guessPosition,
             $distanceKm,
-            $this->calculator->computeScore($distanceKm),
+            $this->calculator->computeScore($distanceKm, $city->areaKm2),
+            $this->calculator->computeTolerance($city->areaKm2),
         );
 
         $state = $state->answerRound($result);

@@ -22,8 +22,8 @@ final class GameStateTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->angers = new City('49007', 'Angers', 159022, 47.4713, -0.5474);
-        $this->lyon = new City('69123', 'Lyon', 522250, 45.7640, 4.8357);
+        $this->angers = new City('49007', 'Angers', 159022, 47.4713, -0.5474, 42.7);
+        $this->lyon = new City('69123', 'Lyon', 522250, 45.7640, 4.8357, 47.9);
     }
 
     public function testStartCreatesAnUnansweredFirstRound(): void
@@ -41,7 +41,7 @@ final class GameStateTest extends TestCase
     public function testAnswerRoundRecordsTheResultAndMarksItAnswered(): void
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
-        $result = new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900);
+        $result = new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0);
 
         $state = $state->answerRound($result);
 
@@ -53,11 +53,11 @@ final class GameStateTest extends TestCase
     public function testAnswerRoundTwiceIsRejected(): void
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
-        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900));
+        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0));
 
         $this->expectException(RoundAlreadyAnsweredException::class);
 
-        $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900));
+        $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0));
     }
 
     public function testAdvanceBeforeAnsweringIsRejected(): void
@@ -72,7 +72,7 @@ final class GameStateTest extends TestCase
     public function testAdvanceMovesToTheNextUnansweredRound(): void
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
-        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900));
+        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0));
 
         $state = $state->advance();
 
@@ -85,8 +85,8 @@ final class GameStateTest extends TestCase
     public function testAdvancingPastTheLastRoundFinishesTheGame(): void
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
-        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900))->advance();
-        $state = $state->answerRound(new RoundResult('69123', new Position(45.8, 4.8), 1.1, 950));
+        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0))->advance();
+        $state = $state->answerRound(new RoundResult('69123', new Position(45.8, 4.8), 1.1, 950, 3.0));
 
         $state = $state->advance();
 
@@ -100,7 +100,7 @@ final class GameStateTest extends TestCase
 
         $this->expectException(GameFinishedException::class);
 
-        $state->answerRound(new RoundResult('69123', new Position(45.8, 4.8), 1.1, 950));
+        $state->answerRound(new RoundResult('69123', new Position(45.8, 4.8), 1.1, 950, 3.0));
     }
 
     public function testAdvancingAFinishedGameIsRejected(): void
@@ -131,7 +131,7 @@ final class GameStateTest extends TestCase
     public function testToArrayForAnAnsweredRoundIncludesTheReveal(): void
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
-        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900));
+        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0));
 
         $payload = $state->toArray(1000);
 
@@ -146,6 +146,7 @@ final class GameStateTest extends TestCase
             'actual' => ['latitude' => 47.4713, 'longitude' => -0.5474],
             'distanceKm' => 3.2,
             'score' => 900,
+            'toleranceKm' => 2.0,
         ], $payload);
     }
 
@@ -167,8 +168,8 @@ final class GameStateTest extends TestCase
     private function finishedGame(): GameState
     {
         $state = GameState::start(Mode::Easy, [$this->angers, $this->lyon]);
-        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900))->advance();
-        $state = $state->answerRound(new RoundResult('69123', new Position(45.8, 4.8), 1.1, 950));
+        $state = $state->answerRound(new RoundResult('49007', new Position(47.5, -0.5), 3.2, 900, 2.0))->advance();
+        $state = $state->answerRound(new RoundResult('69123', new Position(45.8, 4.8), 1.1, 950, 3.0));
 
         return $state->advance();
     }

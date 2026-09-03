@@ -77,7 +77,7 @@ final class CityImportCommand extends Command
     }
 
     /**
-     * @return list<array{insee_code: string, name: string, population: int, latitude: float, longitude: float, tier: string}>
+     * @return list<array{insee_code: string, name: string, population: int, latitude: float, longitude: float, area_km2: float, tier: string}>
      */
     private function parseCsv(SymfonyStyle $io): array
     {
@@ -99,6 +99,7 @@ final class CityImportCommand extends Command
                 'population' => $population,
                 'latitude' => (float) $record['latitude_centre'],
                 'longitude' => (float) $record['longitude_centre'],
+                'area_km2' => (float) $record['superficie_km2'],
             ];
         }
 

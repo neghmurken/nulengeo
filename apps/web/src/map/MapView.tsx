@@ -3,6 +3,9 @@ import { LngLatBounds, MapLibreMap, Marker, type LngLatLike } from 'maplibre-gl'
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { buildStyle } from './buildStyle.ts'
+import { circlePolygon, type LatLng } from './geo.ts'
+
+export type { LatLng } from './geo.ts'
 
 const FRANCE_CENTER: [number, number] = [2.5, 46.6]
 const FRANCE_ZOOM = 5
@@ -10,6 +13,7 @@ const FRANCE_ZOOM = 5
 const GUESS_MARKER_COLOR = '#d9780b'
 const ACTUAL_MARKER_COLOR = '#dd5b61'
 const GUESS_LINE_SOURCE_ID = 'guess-line'
+const TOLERANCE_CIRCLE_SOURCE_ID = 'tolerance-circle'
 const FIT_BOUNDS_PADDING = 80
 
 const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY
@@ -21,14 +25,17 @@ async function fetchStyle(url: string): Promise<StyleSpecification> {
   return (await response.json()) as StyleSpecification
 }
 
-export type LatLng = { latitude: number; longitude: number }
-
 type MapViewProps = {
   onGuessChange: (guess: LatLng) => void
   actualPosition?: LatLng
+  toleranceKm?: number
 }
 
-export function MapView({ onGuessChange, actualPosition }: MapViewProps) {
+export function MapView({
+  onGuessChange,
+  actualPosition,
+  toleranceKm,
+}: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
   const guessMarkerRef = useRef<Marker | null>(null)
@@ -80,9 +87,11 @@ export function MapView({ onGuessChange, actualPosition }: MapViewProps) {
         style: buildStyle(aquarelle, topo),
         center: FRANCE_CENTER,
         zoom: FRANCE_ZOOM,
+        maxPitch: 0,
       })
 
       map.doubleClickZoom.disable()
+      map.dragRotate.disable()
       map.on('dblclick', (event) => placeMarker(event.lngLat))
 
       mapRef.current = map
@@ -143,8 +152,38 @@ export function MapView({ onGuessChange, actualPosition }: MapViewProps) {
     const bounds = new LngLatBounds()
     bounds.extend(guessLngLat)
     bounds.extend(actualLngLat)
+
+    if (toleranceKm) {
+      const ring = circlePolygon(actualPosition, toleranceKm)
+
+      map.addSource(TOLERANCE_CIRCLE_SOURCE_ID, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [ring],
+          },
+        },
+      })
+      map.addLayer({
+        id: TOLERANCE_CIRCLE_SOURCE_ID,
+        type: 'fill',
+        source: TOLERANCE_CIRCLE_SOURCE_ID,
+        paint: {
+          'fill-color': ACTUAL_MARKER_COLOR,
+          'fill-opacity': 0.2,
+        },
+      })
+
+      for (const [longitude, latitude] of ring) {
+        bounds.extend([longitude, latitude])
+      }
+    }
+
     map.fitBounds(bounds, { padding: FIT_BOUNDS_PADDING })
-  }, [actualPosition])
+  }, [actualPosition, toleranceKm])
 
   return <div ref={containerRef} style={{ width: '100%', height: '100svh' }} />
 }

@@ -20,7 +20,7 @@ final readonly class Cities
     public function draw(string $tier, int $count): array
     {
         $rows = $this->connection->fetchAllAssociative(
-            'SELECT insee_code, name, population, latitude, longitude FROM city WHERE tier = ? ORDER BY RANDOM() LIMIT ?',
+            'SELECT insee_code, name, population, latitude, longitude, area_km2 FROM city WHERE tier = ? ORDER BY RANDOM() LIMIT ?',
             [$tier, $count],
             [ParameterType::STRING, ParameterType::INTEGER],
         );
@@ -32,6 +32,7 @@ final readonly class Cities
                 (int) $row['population'],
                 (float) $row['latitude'],
                 (float) $row['longitude'],
+                (float) $row['area_km2'],
             ),
             $rows,
         );

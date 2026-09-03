@@ -36,6 +36,12 @@ tasks:
     cmds:
       - docker compose exec api bin/console app:city:import
 
+  cache-clear:
+    desc: Clear the Symfony cache and wipe active game sessions inside the API container
+    cmds:
+      - docker compose exec api bin/console cache:clear
+      - docker compose exec api sh -c "rm -f /tmp/sess_*"
+
   test-api:
     desc: Run the API test suite (PHPUnit)
     cmds:
@@ -55,7 +61,7 @@ tasks:
   lint-api:
     desc: Run the API lint/static-analysis chain (PHPStan + PHP-CS-Fixer)
     cmds:
-      - docker compose exec api composer lint
+      - docker compose exec api composer lint -- --memory-limit=512M
       - docker compose exec api composer format
 
   lint-web:

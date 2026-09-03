@@ -12,7 +12,11 @@ export function RoundScreen({ game }: { game: PlayingGame }) {
 
   return (
     <section className={styles.container}>
-      <MapView onGuessChange={setGuess} actualPosition={game.actual} />
+      <MapView
+        onGuessChange={setGuess}
+        actualPosition={game.actual}
+        toleranceKm={game.toleranceKm}
+      />
 
       <div className={styles.topLeft}>
         <button onClick={() => returnToMenu()}>{t('round.giveUp')}</button>

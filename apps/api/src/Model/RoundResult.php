@@ -11,6 +11,7 @@ final readonly class RoundResult
         public Position $guessPosition,
         public float $distanceKm,
         public int $score,
+        public float $toleranceKm,
     ) {
     }
 }

@@ -13,8 +13,9 @@ explicite du placement (bouton de confirmation) : aucune pénalité pour un clic
 Pour chaque ville, le joueur voit uniquement son nom et sa population (voir [Sélection des villes](#sélection-des-villes)) — aucune autre indication (région, département) n'est donnée.
 Aucune limite de temps n'est imposée pour placer un marqueur.
 
-Une fois le marqueur validé, le jeu révèle la position réelle de la ville, la distance d'erreur (en km) et le score obtenu pour ce placement (voir [Score](#score)), avant de passer
-à la ville suivante. La carte revient à une vue centrée sur la France entière au début de chaque nouvelle ville (aucun état de zoom/déplacement n'est conservé d'une ville à l'autre).
+Une fois le marqueur validé, le jeu révèle la position réelle de la ville, la distance d'erreur (en km), le score obtenu pour ce placement (voir [Score](#score)) et la zone de
+tolérance de la ville — un disque semi-transparent centré sur sa position réelle, dont le rayon correspond à la tolérance de score de cette ville — avant de passer à la ville
+suivante. La carte revient à une vue centrée sur la France entière au début de chaque nouvelle ville (aucun état de zoom/déplacement n'est conservé d'une ville à l'autre).
 
 Ce score s'additionne à un total de fin de partie.
 
@@ -45,19 +46,25 @@ Les communes éligibles sont réparties selon un unique critère, le niveau de p
  - **Grande** : plus de 80 000 habitants, à l'exception des communes du palier Très grande
  - **Très grande** : les 30 communes les plus peuplées de France métropolitaine (nombre fixe, indépendant de tout seuil de population)
 
-Le critère de niveau de superficie initialement envisagé est abandonné : il n'est pas retenu pour la sélection des villes.
+Le critère de niveau de superficie initialement envisagé est abandonné pour la sélection des villes : il n'est pas retenu comme critère de tirage. La superficie de la commune reste
+toutefois utilisée ailleurs, comme tolérance de score (voir [Score](#score)).
 
 ## Score
 
 A chaque placement, le score est calculé à partir de la distance à vol d'oiseau entre le marqueur posé par le joueur et le centroïde de la commune, selon une décroissance
-exponentielle :
+exponentielle. Une tolérance, propre à chaque ville, est appliquée avant cette décroissance : elle correspond au rayon d'un cercle de superficie égale à celle de la commune,
+plafonné à 8 km. Toute distance inférieure ou égale à cette tolérance rapporte le score maximum ; au-delà, la distance prise en compte dans le calcul est réduite d'autant :
 
 ```
-score = 1000 * e^(-ln(2) / 25 * distance_km)
+tolérance_km      = min(sqrt(superficie_km2 / π), 8)
+distance_effective = max(0, distance_km - tolérance_km)
+score              = 1000 * e^(-ln(2) / (25 - tolérance_km) * distance_effective)
 ```
 
- - score maximum par ville : 1000 points (distance nulle)
- - la distance de calibration est de 25 km : au-delà de cette erreur, le score obtenu tombe à environ la moitié du score maximum (500 points)
+ - score maximum par ville : 1000 points (distance nulle ou inférieure à la tolérance de la ville)
+ - les communes de grande superficie (dont le centroïde est plus arbitraire) offrent ainsi une marge d'erreur plus généreuse que les communes de petite superficie
+ - la distance de calibration est de 25 km, quelle que soit la tolérance de la ville : au-delà de 25 km d'erreur réelle, le score obtenu tombe toujours à environ la moitié
+   du score maximum (500 points)
  - aucun score plancher garanti : le score tend vers 0 à mesure que la distance augmente, sans borne minimale
 
 Le score total d'une partie est la somme des scores obtenus sur les 6 villes, soit un maximum de 6 000 points.

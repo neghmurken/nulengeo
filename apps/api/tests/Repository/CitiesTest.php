@@ -24,6 +24,7 @@ final class CitiesTest extends TestCase
                 population INTEGER NOT NULL,
                 latitude DOUBLE PRECISION NOT NULL,
                 longitude DOUBLE PRECISION NOT NULL,
+                area_km2 DOUBLE PRECISION NOT NULL,
                 tier VARCHAR(10) NOT NULL
             )',
         );
@@ -80,6 +81,7 @@ final class CitiesTest extends TestCase
             'population' => $population,
             'latitude' => 45.0,
             'longitude' => 5.0,
+            'area_km2' => 10.0,
             'tier' => $tier,
         ]);
     }

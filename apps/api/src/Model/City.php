@@ -12,6 +12,7 @@ final readonly class City
         public int $population,
         public float $latitude,
         public float $longitude,
+        public float $areaKm2,
     ) {
     }
 }

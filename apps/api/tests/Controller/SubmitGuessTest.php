@@ -27,6 +27,7 @@ final class SubmitGuessTest extends GameControllerTestCase
         self::assertSame(['latitude' => 46.5, 'longitude' => 2.5], $payload['guess']);
         self::assertArrayHasKey('distanceKm', $payload);
         self::assertArrayHasKey('score', $payload);
+        self::assertArrayHasKey('toleranceKm', $payload);
         self::assertSame($payload['score'], $payload['runningScore']);
     }
 

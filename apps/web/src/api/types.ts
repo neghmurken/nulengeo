@@ -24,6 +24,7 @@ export type PlayingGame = {
   actual?: Coordinates
   distanceKm?: number
   score?: number
+  toleranceKm?: number
 }
 
 export type FinishedGame = {

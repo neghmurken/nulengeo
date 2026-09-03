@@ -42,8 +42,9 @@ Columns used:
  - `nom_standard` — commune name
  - `population` — municipal population
  - `latitude_centre` / `longitude_centre` — commune territory centroid (the "true position" anchor per the functional spec)
+ - `superficie_km2` — commune area, used only to derive the per-city guess tolerance in round scoring, not for city selection/tiering
 
-A Symfony console command (`app:city:import`) fetches this CSV, filters to metropolitan communes (excluding overseas departments/collectivities, whose INSEE codes start with department prefix `97`/`98`) with population > 5,000, ranks them by population to tag the 30 most populous as the fixed-size `huge` tier, then computes the population tier for the rest (Small/Medium/Large per the functional spec, using a strict-lower/inclusive-upper split at the 20,000/80,000 thresholds), and populates the SQLite table (existing rows are replaced, so re-running the command is idempotent).
+A Symfony console command (`app:city:import`) fetches this CSV, filters to metropolitan communes (excluding overseas departments/collectivities, whose INSEE codes start with department prefix `97`/`98`) with population > 5,000, ranks them by population to tag the 30 most populous as the fixed-size `huge` tier, then computes the population tier for the rest (Small/Medium/Large per the functional spec, using a strict-lower/inclusive-upper split at the 20,000/80,000 thresholds), and populates the SQLite table — including each commune's raw `superficie_km2` value, stored as-is for `Calculator` to derive the guess tolerance from at scoring time (existing rows are replaced, so re-running the command is idempotent).
 
 The downloaded CSV is cached on disk (not committed to the repo — gitignored under `var/`) so repeated runs don't re-fetch it. `app:city:import --force` bypasses the cache and re-downloads, for picking up a newer INSEE-derived release. The source URL and cache path are Symfony container parameters (`app.city_import_csv_url`, `app.city_import_cache_path` in `services.yaml`), not hardcoded, so either can be overridden without touching the command.
 
@@ -69,7 +70,7 @@ Six RPC-style routes, all under `/api/games`:
 
 Every endpoint returns the same envelope shape, keyed by `status`; the four mutating endpoints return the fresh state directly rather than requiring a follow-up `GET /current`. `GET /current` reports `idle` (not an error) when the session holds no game — "no game yet" is a fresh session's default state, not an exceptional one.
 
-Round scoring uses `App\Service\Score\Calculator` (haversine distance + the exponential score formula from the functional spec). `app.game_max_score`, `app.game_calibration_distance_km`, and `app.game_round_count` are Symfony parameters (`services.yaml`) — game-balance numbers, deliberately overridable without a code change. The `ln(2)` decay base stays a literal: it's mathematically derived from the calibration distance, not an independent tunable.
+Round scoring uses `App\Service\Score\Calculator` (haversine distance + the exponential score formula from the functional spec), which also owns the per-city guess tolerance: it derives a tolerance in km from the city's `areaKm2` (`App\Model\City`) as the radius of an equal-area circle, capped at `app.game_guess_tolerance_max_km`, then shifts the distance by that tolerance before applying the decay. `app.game_max_score`, `app.game_calibration_distance_km`, `app.game_guess_tolerance_max_km`, and `app.game_round_count` are Symfony parameters (`services.yaml`) — game-balance numbers, deliberately overridable without a code change. The `ln(2)` decay base stays a literal: it's mathematically derived from the calibration distance, not an independent tunable. The computed tolerance is stored on `App\Model\RoundResult` alongside the distance/score and included in the guess response's reveal payload (`toleranceKm`), so the frontend can draw the tolerance zone without recomputing the formula.
 
 ### Cross-origin requests
 
@@ -109,9 +110,10 @@ CSS Modules — scoped plain CSS, no extra build dependency, sufficient for the 
 
 ### Map
 
- - Library: **MapLibre GL JS** (vector-tile based, GPU-rendered, full control over a custom style to show only relief/hydrography and strip all labels/roads/borders/POIs).
+ - Library: **MapLibre GL JS** (vector-tile based, GPU-rendered, full control over a custom style to show only relief/hydrography and strip all labels/roads/borders/POIs). Rotate/tilt are disabled (`dragRotate`, `maxPitch: 0`) — the game only needs pan/zoom.
  - Tile source: **MapTiler**, third-party hosted (not self-hosted PMTiles). A custom, zoom-capped, trimmed self-hosted extract was estimated at tens–a few hundred MB, but hosted third-party tiles were chosen to avoid the tile-build pipeline.
  - API key: embedded client-side, restricted by domain in MapTiler's dashboard. This is standard practice for map tile providers (the key is a quota/billing identifier, not a secret) and avoids proxying every tile request through the backend.
+ - Reveal overlay: on top of the actual-position marker and the dashed guess→actual line, a semi-transparent circle (`apps/web/src/map/geo.ts`'s `circlePolygon`) is drawn around the actual position, radius = the round's `toleranceKm` (from the guess response). Built from real geographic coordinates via a hand-rolled spherical-earth destination-point formula (no turf.js dependency), so it renders at the correct ground size at any zoom/latitude.
 
 ### Testing & quality tooling
 
@@ -132,6 +134,7 @@ A root-level `Taskfile.yml` (`go-task`) provides a single cross-cutting entrypoi
  - `task up` / `task down` — start/stop the Docker Compose stack
  - `task import` — run the city dataset import command inside the API container
  - `task migrate` — run Doctrine Migrations inside the API container
+ - `task cache-clear` — clear the Symfony cache and wipe active game sessions inside the API container
  - `task test` — run both test suites (PHPUnit + Vitest)
  - `task lint` — run both lint/static-analysis chains (PHPStan + PHP-CS-Fixer, ESLint + Prettier)
 

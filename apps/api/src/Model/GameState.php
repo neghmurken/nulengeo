@@ -124,6 +124,7 @@ final readonly class GameState
             $payload['actual'] = ['latitude' => $city->latitude, 'longitude' => $city->longitude];
             $payload['distanceKm'] = $result->distanceKm;
             $payload['score'] = $result->score;
+            $payload['toleranceKm'] = $result->toleranceKm;
         }
 
         return $payload;
